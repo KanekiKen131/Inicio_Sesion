@@ -3,68 +3,64 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package controller;
+import java.io.IOException;
+import java.util.List;
 
-import javax.swing.JOptionPane;
 
 /**
  *
  * @author alexa
  */
 public class InicioSesion {
-    private Utilidades u = new Utilidades();
-    private final String file_name = "Usuario.dat";
 
-    public boolean guardar_usuario(String nombre, String clave) {
-        String data = generar_numeracion() + "\t" + nombre + "\t" + clave + "\n";
-        try {
-            u.save(data, file_name);
-            return true;
-        } catch (Exception e) {
-            System.err.println("Error al guardar usuario: " + e.getMessage());
-            return false;
-        }
+     private Utilidades u = new Utilidades();
+    private String file_name = "Usuario.dat";
+     public boolean guardar_usuario(String nombre, String clave) {
+    String data = nombre + "\t" + clave + "\n";
+    try {
+        u.save(data, file_name);
+        return true;
+    } catch (Exception e) {
+        System.err.println("Error al guardar usuario: " + e.getMessage());
+        return false;
     }
+}
+     public boolean existeUsuario(String usuario) {
+       try {
+        List<String> lines = u.readLines(file_name);
+        for (String line : lines) {
+            String[] partes = line.split("\t");
+            if (partes.length >= 1 && partes[0].equalsIgnoreCase(usuario)) {
+                return true;
+            }
+        }
+    } catch (IOException e) {
+        e.printStackTrace(); 
+    }
+    return false;
+     }
+     public Persona iniciarSesion(String usuario, String clave) {
+    try {
+        List<String> lines = u.readLines(file_name);
+        for (String line : lines) {
+            String[] partes = line.split("\t");
+            if (partes.length >= 2) {
+                String usuarioGuardado = partes[0].trim();
+                String claveGuardada = partes[1].trim();
 
-    public String[][] listar() {
-        try {
-            String[][] data = u.listAll(file_name);
-            return (data != null) ? data : new String[0][0];
-        } catch (Exception e) {
-            System.err.println("Error al listar archivos desde " + file_name + ": " + e.getMessage());
-            return new String[0][0];
-        }
-    }
-
-    public String generar_numeracion() {
-        String[][] listado = listar();
-        int num = (listado != null) ? listado.length + 1 : 1;
-        return String.format("%06d", num);
-    }
-    
-    public int inicioSesion(String usuarioIngresado, String claveIngresada) {
-        String[][] usuarios = listar();
-        if (usuarios.length == 0) {
-            JOptionPane.showMessageDialog(null, "No hay usuarios registrados.");
-            return 0;
-        }
-        for (String[] fila : usuarios) {
-            if (fila.length >= 3) {
-                String nr_usuario = fila[0];
-                String usuario = fila[1];
-                String clave = fila[2];
-                if (usuario.equals(usuarioIngresado)) {
-                    if (clave.equals(claveIngresada)) {
-                        JOptionPane.showMessageDialog(null, "Inicio de sesión exitoso. Bienvenido, " + usuario + ".");
-                        return 1;
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Contraseña incorrecta.");
-                        return 2;
-                    }
+                if (usuarioGuardado.equalsIgnoreCase(usuario.trim()) &&
+                    claveGuardada.equals(clave.trim())) {
+                    return new Persona(usuarioGuardado, claveGuardada);
                 }
             }
         }
-        JOptionPane.showMessageDialog(null, "Usuario no encontrado.");
-        return 3;
+    } catch (IOException e) {
+        e.printStackTrace(); 
     }
+    return null;
 }
 
+
+  
+
+}

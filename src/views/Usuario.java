@@ -4,37 +4,62 @@
  */
 package views;
 import controller.InicioSesion;
+import controller.Persona;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
+
 /**
  *
  * @author alexa
  */
 public class Usuario extends javax.swing.JDialog {
-private InicioSesion i = new InicioSesion();
-    /**
-     * Creates new form Usuario
-     */
+    private InicioSesion i = new InicioSesion();
+
+
     public Usuario(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
     }
-    
-   private void cargar_usuario (){
-   
-    String name = txtusuario.getText().trim();
-    if (name.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Usuario no registrado", "Error", JOptionPane.WARNING_MESSAGE);
-        return;
+
+    private void guardar() {
+        if (txtusuario.getText().isEmpty() || txtclave.getText().isEmpty() || 
+            txtconfirmar.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Llene todos los campos", 
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (!txtclave.getText().equals(txtconfirmar.getText())) {
+            JOptionPane.showMessageDialog(null, "Las contraseñas no coinciden",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            if (!i.guardar_usuario(txtusuario.getText(), txtclave.getText())) {
+                JOptionPane.showMessageDialog(null, "El usuario ya existe",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "Se ha registrado correctamente",
+                        "Success", JOptionPane.INFORMATION_MESSAGE);
+              
+            }
+        }
     }
-    String[][] data = i.buscar(name);
-    if (data != null && data.length > 0) {
-        JOptionPane.showMessageDialog(this, "Documento encontrado.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-        cargarTablaBusqueda(data); 
-        tbltabla.updateUI(); 
+ private void ingresar() {
+    if (txtusuario.getText().isEmpty() || txtclave.getText().isEmpty()) {
+        JOptionPane.showMessageDialog(null, "Llene todos los campos", "Error", 
+                JOptionPane.ERROR_MESSAGE);
+    } else {
+      
+        Persona persona = i.iniciarSesion(txtusuario.getText(), txtclave.getText());
+        if (persona != null) {
+            lbldialog.setText("Bienvenido de vuelta");
+            lblnombre.setText(persona.getUsuario()); 
+        } else {
+            JOptionPane.showMessageDialog(null, "Usuario o contraseña incorrectos",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
-   } 
-    
+}
+private void limpiar() {
+    txtusuario.setText("");
+    txtclave.setText("");
+    txtconfirmar.setText("");
+}
    
 
     /**
@@ -53,13 +78,21 @@ private InicioSesion i = new InicioSesion();
         txtusuario = new javax.swing.JTextField();
         txtclave = new javax.swing.JTextField();
         btnaceptar = new javax.swing.JButton();
+        txtconfirmar = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        btningreso = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
+        lbldialog = new javax.swing.JLabel();
+        lblnombre = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         getContentPane().setLayout(null);
 
         jPanel1.setLayout(null);
 
+        jPanel2.setBackground(new java.awt.Color(51, 51, 51));
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Datos ", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 3, 18), new java.awt.Color(204, 255, 204))); // NOI18N
+        jPanel2.setForeground(new java.awt.Color(51, 51, 51));
         jPanel2.setLayout(null);
 
         jLabel1.setText("Usuario:");
@@ -74,19 +107,66 @@ private InicioSesion i = new InicioSesion();
         jPanel2.add(txtclave);
         txtclave.setBounds(120, 130, 200, 26);
 
-        btnaceptar.setText("ACEPTAR");
+        btnaceptar.setText("AGREGAR");
+        btnaceptar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnaceptarActionPerformed(evt);
+            }
+        });
         jPanel2.add(btnaceptar);
-        btnaceptar.setBounds(150, 200, 110, 27);
+        btnaceptar.setBounds(50, 270, 110, 27);
+        jPanel2.add(txtconfirmar);
+        txtconfirmar.setBounds(120, 200, 200, 26);
+
+        jLabel3.setText("Confirmar Clave:");
+        jPanel2.add(jLabel3);
+        jLabel3.setBounds(10, 200, 100, 30);
+
+        btningreso.setText("INGRESAR");
+        btningreso.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btningresoActionPerformed(evt);
+            }
+        });
+        jPanel2.add(btningreso);
+        btningreso.setBounds(250, 270, 110, 27);
 
         jPanel1.add(jPanel2);
-        jPanel2.setBounds(20, 30, 400, 300);
+        jPanel2.setBounds(20, 30, 400, 310);
 
         getContentPane().add(jPanel1);
-        jPanel1.setBounds(0, 0, 450, 360);
+        jPanel1.setBounds(0, 0, 450, 350);
 
-        setSize(new java.awt.Dimension(465, 368));
+        jPanel3.setBackground(new java.awt.Color(51, 51, 51));
+        jPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanel3.setLayout(null);
+
+        lbldialog.setBackground(new java.awt.Color(51, 51, 51));
+        lbldialog.setForeground(new java.awt.Color(204, 255, 255));
+        jPanel3.add(lbldialog);
+        lbldialog.setBounds(30, 20, 140, 50);
+
+        lblnombre.setBackground(new java.awt.Color(255, 255, 255));
+        lblnombre.setForeground(new java.awt.Color(204, 255, 255));
+        jPanel3.add(lblnombre);
+        lblnombre.setBounds(200, 30, 180, 40);
+
+        getContentPane().add(jPanel3);
+        jPanel3.setBounds(20, 370, 390, 190);
+
+        setSize(new java.awt.Dimension(465, 620));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnaceptarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnaceptarActionPerformed
+        guardar();
+        limpiar();
+    }//GEN-LAST:event_btnaceptarActionPerformed
+
+    private void btningresoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btningresoActionPerformed
+      ingresar();
+     limpiar();
+    }//GEN-LAST:event_btningresoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -132,11 +212,17 @@ private InicioSesion i = new InicioSesion();
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnaceptar;
+    private javax.swing.JButton btningreso;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JLabel lbldialog;
+    private javax.swing.JLabel lblnombre;
     private javax.swing.JTextField txtclave;
+    private javax.swing.JTextField txtconfirmar;
     private javax.swing.JTextField txtusuario;
     // End of variables declaration//GEN-END:variables
 }
